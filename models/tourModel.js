@@ -88,25 +88,25 @@ const tourSchema = new mongoose.Schema(
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
-// Document middleWare of mongoose:runs before .save() and .create() not on insermany()
-tourSchema.pre('save', function (next) {
-  this.slug = slugify(this.name, { lower: true });
-  next();
-});
-//post
-tourSchema.post('save', function (doc,next) {
-  console.log(doc);
-  next();
-})
-// Query middleware
-tourSchema.pre(/^find/, function (next) {
-  this.find({ secretTour: { $ne: true } });
-  next();
-})
-//Aggregation middleware
-tourSchema.pre('aggregate', function (next) {
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
-  next();
-})
+// // Document middleWare of mongoose:runs before .save() and .create() not on insermany()
+// tourSchema.pre('save', function (next) {
+//   this.slug = slugify(this.name, { lower: true });
+//   next();
+// });
+// //post
+// tourSchema.post('save', function (doc,next) {
+//   console.log(doc);
+//   next();
+// })
+// // Query middleware
+// tourSchema.pre(/^find/, function (next) {
+//   this.find({ secretTour: { $ne: true } });
+//   next();
+// })
+// //Aggregation middleware
+// tourSchema.pre('aggregate', function (next) {
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+//   next();
+// })
 const Tour = new mongoose.model('Tour', tourSchema);
 module.exports = Tour;
