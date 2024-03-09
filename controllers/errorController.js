@@ -1,11 +1,16 @@
 const AppError = require('../utils/appError');
+const handleJWTError = (err) =>
+  new AppError('Invalid token. Please Login Again', 401);
+const handleJWTExpiredError = (err) =>
+  new AppError('Your token expired!. Login Again', 401);
+
 const handleValidationErrorDB = (err) => {
-    const errors = Object.values(err.errors).map(el => el.message);
-    const message = `Invalid input data. ${errors.join('. ')}`;
-    return new AppError(message, 400);
-  };
+  const errors = Object.values(err.errors).map((el) => el.message);
+  const message = `Invalid input data. ${errors.join('. ')}`;
+  return new AppError(message, 400);
+};
 const handleCastErrorDB = (err) => {
-    const message = `Invalid ${err.path}:${err.value}`;
+  const message = `Invalid ${err.path}:${err.value}`;
   return new AppError(message, 400);
 };
 const handleDuplicateErrorDB = (err) => {
@@ -50,8 +55,10 @@ module.exports = (err, req, res, next) => {
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
     if (err.name === 'CastError') error = handleCastErrorDB(error);
-      if (error.code === 11000) error = handleDuplicateErrorDB(error);
-      if (err.name === "ValidationError") error = handleValidationErrorDB(error);
+    if (error.code === 11000) error = handleDuplicateErrorDB(error);
+    if (err.name === 'ValidationError') error = handleValidationErrorDB(error);
+    if (err.name === 'JsonWebTokenError') error = handleJWTError(error);
+    if (err.name === 'TokenExpiredError') error = handleJWTExpiredError(error);
 
     sendErrorProd(error, res);
   }
